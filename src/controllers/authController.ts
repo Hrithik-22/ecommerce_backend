@@ -8,20 +8,25 @@ import { ErrorCodes } from "../exceptions/root";
 
 
 export const signup=async (req:Request,res:Response,next:NextFunction)=>{
-    const {email,name,password}=req.body;
-    let user=await prisma.user.findFirst({where:{email}});
-    if(user){
-        // throw Error("User already exists");
-        return next(new BadRequestException("User already exists!!",ErrorCodes.USER_ALREADY_EXISTS));
-    }
-    user=await prisma.user.create({
-        data:{
-            name,
-            email,
-            password:hashSync(password,10)
+    try {
+        const {email,name,password}=req.body;
+        let user=await prisma.user.findFirst({where:{email}});
+        if(user){
+            // throw Error("User already exists");
+            return next(new BadRequestException("User already exists!!",ErrorCodes.USER_ALREADY_EXISTS));
         }
-    })
-    res.json({status:200,data:user,msg:"User Created Succesfully"})
+        user=await prisma.user.create({
+            data:{
+                name,
+                email,
+                password:hashSync(password,10)
+            }
+        })
+        res.json({status:200,data:user,msg:"User Created Succesfully"})
+    } catch (error) {
+        
+    }
+   
 }
 
 export const login=async (req:Request,res:Response,next:NextFunction)=>{

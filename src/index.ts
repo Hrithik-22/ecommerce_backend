@@ -10,8 +10,18 @@ app.use(express.urlencoded({ extended: false }));
 app.use('/api',rootRouter);
 import {  PrismaClient } from "@prisma/client";
 import { errorMiddlware } from "./middlewares/errors";
+import { SignUpSchema } from "./schema/users";
 const prisma=new PrismaClient({
     log:["query","error"],
+}).$extends({
+    query:{
+        user:{
+            create({args,query}){
+                args.data=SignUpSchema.parse(args.data);
+                return query(args);
+            }
+        }
+    }
 });
 
 export default prisma;
